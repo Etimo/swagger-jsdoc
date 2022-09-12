@@ -6,6 +6,7 @@ const { build } = require('./specification');
  * @param {string} options.encoding Optional, passed to readFileSync options. Defaults to 'utf8'.
  * @param {boolean} options.failOnErrors Whether or not to throw when parsing errors. Defaults to false.
  * @param {boolean} options.verbose Whether the swagger snippet containing each error should be included in print/throws. Defaults to false.
+ * @param {boolean} options.validate Whether to validate the resulting specification. Defaults to false.
  * @param {string} options.format Optional, defaults to '.json' - target file format '.yml' or '.yaml'.
  * @param {object} options.swaggerDefinition
  * @param {object} options.definition

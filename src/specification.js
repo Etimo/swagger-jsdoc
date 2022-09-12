@@ -11,6 +11,10 @@ const {
   isTagPresentInTags,
 } = require('./utils');
 
+function formatError(err) {
+  return [err.toString(), 'Embedded within:', err.annotation, ''].join('\n');
+}
+
 /**
  * Prepare the swagger/openapi specification object.
  * @see https://github.com/OAI/OpenAPI-Specification/tree/master/versions
@@ -106,11 +110,33 @@ function clean(swaggerObject) {
  */
 function finalize(swaggerObject, options) {
   let specification = swaggerObject;
-  parser.parse(swaggerObject, (err, api) => {
-    if (!err) {
-      specification = api;
+  parser.parse(
+    swaggerObject,
+    {
+      validate: {
+        schema: true,
+        spec: true,
+      },
+    },
+    (err, api) => {
+      if (!err) {
+        specification = api;
+      }
     }
-  });
+  );
+
+  if (options.validate) {
+    parser.validate(swaggerObject, (err, api) => {
+      if (err) {
+        console.error('Validation error:');
+        console.error(err.message);
+        console.error('Details:');
+        console.error(JSON.stringify(err.details, null, 2));
+      } else {
+        console.log('Success!');
+      }
+    });
+  }
 
   if (specification.openapi) {
     specification = clean(specification);
@@ -190,7 +216,14 @@ function build(options) {
   const yamlDocsErrors = [];
   const yamlDocsReady = [];
 
+  if (options.verbose) {
+    options.apis.map((api) => console.trace('Incoming api glob:', api));
+  }
+
   for (const filePath of convertGlobPaths(options.apis)) {
+    if (options.verbose) {
+      console.trace('Parsing file:', filePath);
+    }
     const {
       yaml: yamlAnnotations,
       jsdoc: jsdocAnnotations,
@@ -256,15 +289,20 @@ function build(options) {
             .filter((a) => a)
             .join('')
             .split(' at line')[0];
-          const anchor = yamlDocsAnchors.get(refErr);
-          const anchorString = anchor.cstNode.toString();
-          const originalString = docWithErr.cstNode.toString();
-          const readyDocument = YAML.parseDocument(
-            `${anchorString}\n${originalString}`
-          );
 
-          yamlDocsReady.push(readyDocument);
-          errsToDelete.push(index);
+          const anchor = yamlDocsAnchors.get(refErr);
+          if (!anchor) {
+            // console.error(refErr);
+          } else {
+            const anchorString = anchor.cstNode.toString();
+            const originalString = docWithErr.cstNode.toString();
+            const readyDocument = YAML.parseDocument(
+              `${anchorString}\n${originalString}`
+            );
+
+            yamlDocsReady.push(readyDocument);
+            errsToDelete.push(index);
+          }
         }
       });
       // reverse sort the deletion array so we always delete from the end
@@ -278,24 +316,17 @@ function build(options) {
 
     // Format errors into a printable/throwable string
     const errReport = yamlDocsErrors
+      .filter(({ errors }) => errors.length > 0) // Dont output errors if there are no errors left
       .map(({ errors, filePath }) => {
-        let str = `Error in ${filePath} :\n`;
-        if (options.verbose) {
-          str += errors
-            .map(
-              (e) =>
-                `${e.toString()}\nImbedded within:\n\`\`\`\n  ${e.annotation.replace(
-                  /\n/g,
-                  '\n  '
-                )}\n\`\`\``
-            )
-            .join('\n');
-        } else {
-          str += errors.map((e) => e.toString()).join('\n');
-        }
-        return str;
-      })
-      .filter((error) => !!error);
+        let strs = [
+          '===========================================================',
+          `Error in ${filePath}:`,
+          errors.map(formatError),
+          '===========================================================',
+          '',
+        ];
+        return strs.join('\n');
+      });
 
     if (errReport.length) {
       if (options.failOnErrors) {
