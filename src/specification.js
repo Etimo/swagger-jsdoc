@@ -12,7 +12,7 @@ const {
 } = require('./utils');
 
 function formatError(err) {
-  return [err.toString(), 'Embedded within:', err.annotation, ''].join('\n');
+  return [err.toString(), 'Imbedded within:', err.annotation, ''].join('\n');
 }
 
 /**
@@ -216,13 +216,9 @@ function build(options) {
   const yamlDocsErrors = [];
   const yamlDocsReady = [];
 
-  if (options.verbose) {
-    options.apis.map((api) => console.trace('Incoming api glob:', api));
-  }
-
   for (const filePath of convertGlobPaths(options.apis)) {
     if (options.verbose) {
-      console.trace('Parsing file:', filePath);
+      console.log('Parsing file:', filePath);
     }
     const {
       yaml: yamlAnnotations,

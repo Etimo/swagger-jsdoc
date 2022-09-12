@@ -1,7 +1,7 @@
 {
   "name": "swagger-jsdoc",
   "description": "Generates swagger doc based on JSDoc",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "engines": {
     "node": ">=12.0.0"
   },
@@ -42,19 +42,19 @@
     "supertest": "6.0.1"
   },
   "license": "MIT",
-  "homepage": "https://github.com/Surnet/swagger-jsdoc",
+  "homepage": "https://github.com/Etimo/swagger-jsdoc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Surnet/swagger-jsdoc.git"
+    "url": "https://github.com/Etimo/swagger-jsdoc.git"
   },
   "keywords": [
     "swagger",
     "openapi",
     "jsdoc"
   ],
-  "author": "https://github.com/Surnet/swagger-jsdoc/graphs/contributors",
+  "author": "https://github.com/Etimo/swagger-jsdoc/graphs/contributors",
   "bugs": {
-    "url": "https://github.com/Surnet/swagger-jsdoc/issues"
+    "url": "https://github.com/Etimo/swagger-jsdoc/issues"
   },
   "resolutions": {
     "minimist": ">=1.2.3"
