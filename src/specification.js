@@ -314,14 +314,13 @@ function build(options) {
     const errReport = yamlDocsErrors
       .filter(({ errors }) => errors.length > 0) // Dont output errors if there are no errors left
       .map(({ errors, filePath }) => {
-        let strs = [
+        return [
           '===========================================================',
           `Error in ${filePath}:`,
-          errors.map(formatError),
+          errors.map(formatError).join('\n'),
           '===========================================================',
           '',
-        ];
-        return strs.join('\n');
+        ].join('\n');
       });
 
     if (errReport.length) {

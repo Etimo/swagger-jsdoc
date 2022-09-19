@@ -63,7 +63,8 @@ Imbedded within:
 /invalid_yaml:
        - foo
   bar
-,YAMLSemanticError: Implicit map keys need to be followed by map values at line 3, column 3:
+
+YAMLSemanticError: Implicit map keys need to be followed by map values at line 3, column 3:
 
   bar
   ^^^
